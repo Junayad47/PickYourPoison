@@ -111,6 +111,8 @@
             box-shadow: 0 10px 40px rgba(255, 255, 255, 0.2), 0 0 20px var(--gold);
             z-index: 1; /* Above the snow */
             transition: all 0.3s ease;
+            position: relative; /* For snowman positioning */
+            overflow: hidden; /* Keeps snowman contained */
         }
 
         .screen {
@@ -120,6 +122,23 @@
         .screen.active {
             display: block;
         }
+
+        /* --- Snowman --- */
+        #snowman {
+            position: absolute;
+            bottom: -10px;
+            left: 10px;
+            font-size: 4rem; /* Responsive */
+            z-index: 10;
+            transition: transform 0.3s ease;
+            user-select: none;
+            opacity: 0.9;
+        }
+        
+        #snowman:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
         
         /* --- Loading Spinner --- */
         .loader {
@@ -168,12 +187,13 @@
             background: #eee;
             border: 2px dashed var(--festive-red-dark);
             padding: 16px;
-            font-size: 1.5rem;
+            font-size: 2rem; /* Bigger for 6 digits */
             font-weight: bold;
             text-align: center;
             margin: 20px 0;
             color: var(--text-dark);
             user-select: all;
+            letter-spacing: 3px;
         }
 
         .game-button {
@@ -266,18 +286,18 @@
             background: var(--text-dark);
             color: var(--text-light);
             cursor: pointer;
-            min-height: 400px;
+            min-height: 300px; /* Reduced height to fit globe */
             font-size: 2rem;
         }
         
         #message-box.online-wait {
             background: var(--text-dark);
             color: var(--text-light);
-            min-height: 400px;
+            min-height: 300px; /* Reduced height to fit globe */
             font-size: 2rem;
         }
 
-        /* --- Gift Grid (Flexbox) --- */
+        /* --- Gift Grid (Snowglobe) --- */
         #ornament-grid {
             /* This is now a flex container! */
             display: flex;
@@ -285,7 +305,18 @@
             justify-content: center;
             align-items: center;
             gap: 16px;
-            padding: 10px;
+            
+            /* Snowglobe shape */
+            max-width: 500px; /* Max size of globe */
+            max-height: 500px;
+            width: 100%;
+            aspect-ratio: 1 / 1; /* Make it a square to be a circle */
+            margin: 0 auto 20px auto;
+            padding: 30px; /* Space from the edge */
+            border: 4px solid var(--ice-blue-dark);
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%; /* The magic! */
+            overflow: hidden; /* Clips children to the circle */
             
             visibility: visible;
             transition: visibility 0.2s;
@@ -294,13 +325,15 @@
         #ornament-grid.hidden {
             visibility: hidden;
             height: 0;
+            padding: 0;
+            border: 0;
             overflow: hidden;
         }
 
         .ornament {
             /* Flex item size */
-            flex: 0 0 80px;
-            height: 80px;
+            flex: 0 0 70px;
+            height: 70px;
             
             /* Icy crystal style */
             background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 100%);
@@ -319,6 +352,7 @@
             text-shadow: 0 0 10px #fff;
             position: relative;
             overflow: hidden;
+            color: var(--ice-blue-dark);
         }
         
         /* Sparkle/Glint effect */
@@ -359,6 +393,7 @@
             cursor: not-allowed;
             transform: scale(0.95);
             box-shadow: inset 0 0 10px #fff;
+            color: var(--text-dark); /* Color for present */
         }
         
         .ornament.poison {
@@ -386,20 +421,38 @@
             h2 { font-size: 1.8rem; }
             #status-bar { flex-direction: column; gap: 8px; }
             
+            #snowman {
+                font-size: 3rem;
+                bottom: -5px;
+                left: 5px;
+            }
+            
             /* Adjust flex item size for mobile */
             .ornament {
-                flex: 0 0 60px;
-                height: 60px;
-                font-size: 2rem;
+                flex: 0 0 50px;
+                height: 50px;
+                font-size: 1.8rem;
             }
             
             #ornament-grid {
-                gap: 12px;
+                gap: 10px;
+                padding: 15px;
             }
             
             #message-box.transition, #message-box.online-wait {
                 min-height: 250px;
                 font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+             .ornament {
+                flex: 0 0 40px;
+                height: 40px;
+                font-size: 1.5rem;
+            }
+            #ornament-grid {
+                gap: 8px;
             }
         }
     </style>
@@ -409,6 +462,8 @@
     <div id="snow-container"></div>
 
     <div id="game-container">
+        
+        <div id="snowman">⛄</div>
 
         <!-- ===== MODE SELECT SCREEN ===== -->
         <div id="mode-select-screen" class="screen active">
@@ -425,7 +480,7 @@
             <button id="host-game-btn" class="game-button">Host New Game</button>
             <div class="input-group" style="margin-top: 20px;">
                 <label for="join-game-id">Or Join Game:</label>
-                <input type="text" id="join-game-id" placeholder="Enter Game ID">
+                <input type="text" id="join-game-id" placeholder="Enter 6-Digit ID" maxlength="6" pattern="\d*">
             </div>
             <button id="join-game-btn" class="game-button secondary">Join Game</button>
             <button id="back-to-mode-select-btn" class="game-button" style="background: #555; border-bottom-color: #333; margin-top: 20px;">Back</button>
@@ -438,7 +493,7 @@
             <p id="loading-message" class="loading-text">Connecting to the North Pole...</p>
             <div id="game-id-display-container" style="display: none;">
                 <p>Tell your friend to join with this Game ID:</p>
-                <div id="game-id-display">GAME_ID_HERE</div>
+                <div id="game-id-display">123456</div>
             </div>
         </div>
 
@@ -707,6 +762,7 @@
                  const ornament = document.createElement('div');
                 ornament.classList.add('ornament');
                 ornament.dataset.id = id;
+                ornament.innerHTML = '❄️'; // Default snowflake
                 
                 if (isRevealed) {
                     ornament.classList.add('revealed');
@@ -830,6 +886,23 @@
             // ==============================================
             // === ONLINE (FIRESTORE) GAME LOGIC ===========
             // ==============================================
+
+            /**
+             * Generates a unique 6-digit game ID
+             */
+             async function generateUniqueGameId() {
+                let id = '';
+                let isUnique = false;
+                while (!isUnique) {
+                    id = Math.floor(100000 + Math.random() * 900000).toString();
+                    const gameRef = doc(db, `christmas_hazard_games`, id);
+                    const gameDoc = await getDoc(gameRef);
+                    if (!gameDoc.exists()) {
+                        isUnique = true;
+                    }
+                }
+                return id;
+            }
             
             /**
              * Initializes Firebase and authenticates the user
@@ -880,7 +953,7 @@
                 try {
                     await initFirebase();
                     
-                    gameId = doc(collection(db, 'temp')).id; // Generate a random ID
+                    gameId = await generateUniqueGameId(); // Generate 6-digit ID
                    // Use a simple root collection path
                    const gameRef = doc(db, `christmas_hazard_games`, gameId);
                     
@@ -925,8 +998,8 @@
              */
             async function joinGame() {
                 const joinId = joinGameIdInput.value.trim();
-                if (!joinId) {
-                    alert('Please enter a Game ID.');
+                if (!joinId || joinId.length !== 6) {
+                    alert('Please enter a valid 6-Digit Game ID.');
                     return;
                 }
                 
@@ -1168,7 +1241,11 @@
              * Delegates to OFFLINE or ONLINE logic.
              */
             async function onOrnamentClick(e) {
-                const ornamentId = parseInt(e.target.dataset.id);
+                // Find the .ornament element, even if the click was on the emoji inside it
+                const ornamentElement = e.target.closest('.ornament');
+                if (!ornamentElement) return;
+
+                const ornamentId = parseInt(ornamentElement.dataset.id);
                 if (!ornamentId) return;
                 
                 if (isOnlineMode) {
@@ -1182,7 +1259,6 @@
                 } else {
                     // --- OFFLINE LOGIC ---
                     const ornamentData = local_ornaments.find(m => m.id === ornamentId);
-                    const ornamentElement = e.target;
                     
                     if (local_gameState === 'P1_POISON') {
                         local_player1Poison = ornamentId;
