@@ -6,461 +6,13 @@
     <title>Christmas Hazard</title>
     
     <!-- 
-      This game is a single, self-contained HTML file. 
-      All CSS and JavaScript is inline.
-      It supports both OFFLINE (hot-seat) and ONLINE (real-time) play.
+      This game's HTML and JavaScript.
+      All styles are in the external 'style.css' file.
     -->
     
-    <style>
-        /* --- Basic Setup & Theme --- */
-        :root {
-            --bg-night: #0c0f21;
-            --bg-snow: #f1f5f9;
-            --text-dark: #1e293b;
-            --text-light: #e2e8f0;
-            --festive-red: #dc2626;
-            --festive-red-dark: #b91c1c;
-            --festive-green: #166534;
-            --festive-green-dark: #14532d;
-            --gold: #f59e0b;
-            --gold-dark: #d97706;
-            --ice-blue: #7dd3fc;
-            --ice-blue-dark: #0369a1;
-            --tree-trunk: #5d4037;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: linear-gradient(to bottom, var(--bg-night), #1a1d3a);
-            color: var(--text-light);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 16px;
-            overflow: hidden; /* Hides scrollbars from snow */
-        }
-
-        /* --- Animated Snow Background --- */
-        #snow-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .flake {
-            position: absolute;
-            top: -10px;
-            background: #fff;
-            border-radius: 50%;
-            opacity: 0.6;
-            animation: fall linear infinite;
-        }
-
-        @keyframes fall {
-            to {
-                transform: translateY(105vh);
-                opacity: 0;
-            }
-        }
-        
-        /* --- Titles & Text --- */
-        h1, h2, h3 {
-            font-family: 'Times New Roman', Times, serif;
-            color: var(--text-dark);
-            text-align: center;
-            text-shadow: 1px 1px 1px #fff4;
-        }
-        
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 12px;
-            color: var(--festive-red-dark);
-        }
-        
-        h2 {
-            font-size: 2rem;
-            margin-bottom: 16px;
-        }
-
-        p {
-            font-size: 1.1rem;
-            line-height: 1.6;
-            margin-bottom: 16px;
-            text-align: center;
-        }
-
-        /* --- Game Container & Screens --- */
-        #game-container {
-            width: 100%;
-            max-width: 900px;
-            background: var(--bg-snow);
-            color: var(--text-dark);
-            border: 8px solid var(--festive-red-dark);
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 10px 40px rgba(255, 255, 255, 0.2), 0 0 20px var(--gold);
-            z-index: 1; /* Above the snow */
-            transition: all 0.3s ease;
-            position: relative; /* For snowman positioning */
-            overflow: hidden; /* Keeps snowman contained */
-        }
-
-        .screen {
-            display: none; /* Hidden by default */
-        }
-
-        .screen.active {
-            display: block;
-        }
-
-        /* --- Snowman --- */
-        #snowman {
-            position: absolute;
-            bottom: -10px;
-            left: 10px;
-            font-size: 4rem; /* Responsive */
-            z-index: 10;
-            transition: transform 0.3s ease;
-            user-select: none;
-            opacity: 0.9;
-        }
-        
-        #snowman:hover {
-            transform: scale(1.1) rotate(5deg);
-        }
-
-        
-        /* --- Loading Spinner --- */
-        .loader {
-            width: 60px;
-            height: 60px;
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid var(--festive-red);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .loading-text {
-            text-align: center;
-            font-size: 1.2rem;
-            font-weight: bold;
-        }
-
-        /* --- Input & Buttons --- */
-        .input-group {
-            margin-bottom: 16px;
-        }
-
-        .input-group label {
-            display: block;
-            font-size: 1.2rem;
-            font-weight: bold;
-            margin-bottom: 8px;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 12px;
-            font-size: 1.1rem;
-            border: 2px solid #ccc;
-            border-radius: 8px;
-            background: #fff;
-        }
-        
-        #game-id-display {
-            background: #eee;
-            border: 2px dashed var(--festive-red-dark);
-            padding: 16px;
-            font-size: 2rem; /* Bigger for 6 digits */
-            font-weight: bold;
-            text-align: center;
-            margin: 20px 0;
-            color: var(--text-dark);
-            user-select: all;
-            letter-spacing: 3px;
-        }
-
-        .game-button {
-            display: block;
-            width: 100%;
-            padding: 16px;
-            font-family: 'Times New Roman', Times, serif;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #fff;
-            background: linear-gradient(to bottom, var(--festive-red), var(--festive-red-dark));
-            border: none;
-            border-bottom: 4px solid #7f1d1d;
-            border-radius: 8px;
-            cursor: pointer;
-            text-shadow: 1px 1px 2px #000a;
-            transition: all 0.2s ease;
-            margin-top: 10px;
-        }
-        
-        .game-button.secondary {
-             background: linear-gradient(to bottom, var(--gold), var(--gold-dark));
-             border-bottom-color: #a15c00;
-        }
-        
-        .game-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-        }
-        
-        .game-button:active {
-            transform: translateY(1px);
-            border-bottom-width: 2px;
-        }
-
-        #play-again-btn {
-            background: linear-gradient(to bottom, var(--festive-green), var(--festive-green-dark));
-            border-bottom-color: #052e16;
-        }
-
-        /* --- Game Screen --- */
-        #status-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px;
-            background: #e0e6ec;
-            border-radius: 8px;
-            margin-bottom: 16px;
-            border: 2px solid #cbd5e1;
-        }
-        
-        .player-status {
-            font-size: 1.2rem;
-            font-weight: bold;
-            padding: 8px 12px;
-            border-radius: 6px;
-            transition: all 0.3s ease;
-        }
-        
-        .player-status.active {
-            background-color: var(--gold);
-            color: var(--text-dark);
-            box-shadow: 0 0 10px var(--gold);
-        }
-
-        #turn-indicator {
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-
-        #message-box {
-            font-size: 1.3rem;
-            font-weight: bold;
-            text-align: center;
-            min-height: 50px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 16px;
-            background: #fff;
-            border: 2px dashed #cbd5e1;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            line-height: 1.5;
-            position: relative;
-            z-index: 20;
-        }
-        
-        /* This class is added when it's a "pass the device" screen */
-        #message-box.transition {
-            background: var(--text-dark);
-            color: var(--text-light);
-            cursor: pointer;
-            min-height: 300px;
-            font-size: 2rem;
-        }
-        
-        /* This class is added when it's the opponent's turn online */
-        #message-box.online-wait {
-            background: rgba(28, 41, 59, 0.9); /* Dark, semi-transparent */
-            color: var(--text-light);
-            min-height: 300px;
-            font-size: 2rem;
-        }
-
-        /* --- Christmas Tree Grid (NOW A RECTANGLE) --- */
-        
-        /* Removed #tree-container, #tree-star, #tree-trunk CSS */
-
-        #ornament-grid {
-            /* This is now a simple, responsive flex container! */
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            align-items: center;
-            gap: 16px;
-            
-            /* Set a max-width to create the 8-wide grid on desktop */
-            /* (70px ornament + 16px gap) * 8 rows - 16px last gap = 672px */
-            max-width: 700px; 
-            margin: 20px auto; /* Center the grid */
-            
-            visibility: visible;
-            transition: visibility 0.2s;
-            position: relative;
-        }
-        
-        /* New animation for opponent's turn */
-        #ornament-grid.opponent-picking .ornament:not(.revealed):not(:hover) {
-            animation: shiver 0.7s infinite ease-in-out;
-        }
-
-        @keyframes shiver {
-            0%, 100% { transform: translateX(0) rotate(0); }
-            25% { transform: translateX(-2px) rotate(-3deg); }
-            75% { transform: translateX(2px) rotate(3deg); }
-        }
-
-
-        .ornament {
-            /* Flex item size */
-            flex: 0 0 70px;
-            height: 70px;
-            
-            /* Icy crystal style */
-            background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 100%);
-            border: 2px solid rgba(255, 255, 255, 0.5);
-            border-radius: 12px;
-            backdrop-filter: blur(5px);
-            -webkit-backdrop-filter: blur(5px);
-            
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 2.5rem; /* For emoji */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            user-select: none; /* Prevents text selection */
-            text-shadow: 0 0 10px #fff;
-            position: relative;
-            overflow: hidden;
-            color: var(--ice-blue-dark);
-        }
-        
-        /* Sparkle/Glint effect */
-        .ornament::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 20px;
-            height: 200%;
-            background: rgba(255,255,255,0.5);
-            transform: rotate(30deg);
-            opacity: 0;
-            transition: opacity 0.4s ease;
-        }
-        
-        .ornament:hover::before {
-            opacity: 1;
-            animation: glint 1.5s ease-in-out infinite;
-        }
-
-        @keyframes glint {
-            0% { transform: rotate(30deg) translateX(-150px); }
-            100% { transform: rotate(30deg) translateX(150px); }
-        }
-        
-        
-        .ornament:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 20px var(--gold), 0 0 30px #fff;
-            background: rgba(255, 255, 255, 0.3);
-        }
-        
-        /* Ornament States */
-        .ornament.revealed {
-            background: #e0f2fe; /* Icy blue */
-            border-color: #38bdf8;
-            cursor: not-allowed;
-            transform: scale(0.95);
-            box-shadow: inset 0 0 10px #fff;
-            color: var(--text-dark); /* Color for present */
-        }
-        
-        .ornament.poison {
-            background: #27272a !important; /* Coal black */
-            border-color: #000 !important;
-            color: #fff;
-            animation: shake 0.5s ease-in-out;
-        }
-        
-        .ornament.disabled {
-            pointer-events: none;
-            opacity: 0.7;
-        }
-
-        /* --- Animations --- */
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-8px); }
-            40%, 80% { transform: translateX(8px); }
-        }
-
-        /* --- Responsive Design --- */
-        @media (max-width: 768px) {
-            h1 { font-size: 2rem; }
-            h2 { font-size: 1.8rem; }
-            #status-bar { flex-direction: column; gap: 8px; }
-            
-            #snowman {
-                font-size: 3rem;
-                bottom: -5px;
-                left: 5px;
-            }
-            
-            /* Adjust flex item size for mobile */
-            .ornament {
-                flex: 0 0 50px;
-                height: 50px;
-                font-size: 1.8rem;
-            }
-            
-            #ornament-grid {
-                gap: 10px;
-                /* max-width will not be hit, so it will be 100% wide */
-            }
-            
-            #message-box.transition, #message-box.online-wait {
-                min-height: 250px;
-                font-size: 1.5rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-             .ornament {
-                flex: 0 0 40px;
-                height: 40px;
-                font-size: 1.5rem;
-            }
-            #ornament-grid {
-                gap: 8px;
-            }
-        }
-    </style>
+    <!-- Link to the external stylesheet -->
+    <link rel="stylesheet" href="style.css">
+    
 </head>
 <body>
 
@@ -531,7 +83,6 @@
                 Loading gifts...
             </div>
             
-            <!-- Removed the #tree-container wrapper -->
             <div id="ornament-grid">
                 <!-- Gifts will be generated by JavaScript -->
             </div>
@@ -769,15 +320,12 @@
                  const ornament = document.createElement('div');
                 ornament.classList.add('ornament');
                 ornament.dataset.id = id;
-                ornament.innerHTML = '❄️'; // Default snowflake
+                // Icons are now handled by CSS ::before
                 
                 if (isRevealed) {
                     ornament.classList.add('revealed');
                     if (isPoison) {
                         ornament.classList.add('poison');
-                        ornament.innerHTML = '⚫'; // Coal
-                    } else {
-                        ornament.innerHTML = '🎁'; // Present
                     }
                 }
                 return ornament;
@@ -790,7 +338,6 @@
                 local_gameState = 'P1_POISON';
                 messageBox.textContent = `${local_player1Name}, click a gift to fill with COAL. (Don't let ${local_player2Name} see!)`;
                 messageBox.classList.remove('transition');
-                // grid.classList.remove('hidden'); // Grid is no longer hidden
                 updateOfflinePlayerStatus();
                 turnIndicator.textContent = 'Naughty Phase';
             }
@@ -803,7 +350,6 @@
                     local_gameState = 'P2_POISON';
                     messageBox.textContent = `${local_player2Name}, pick YOUR gift to fill with COAL. (Don't let ${local_player1Name} see!)`;
                     messageBox.classList.remove('transition');
-                    // grid.classList.remove('hidden'); // Grid is no longer hidden
                     grid.classList.remove('opponent-picking'); // Stop shivering
                 }
                 else if (local_gameState === 'START_TURN_WAIT') {
@@ -811,7 +357,6 @@
                     local_currentPlayer = 1;
                     messageBox.textContent = `The unwrapping begins! ${local_player1Name}, pick a gift.`;
                     messageBox.classList.remove('transition');
-                    // grid.classList.remove('hidden'); // Grid is no longer hidden
                     grid.classList.remove('opponent-picking'); // Stop shivering
                     updateOfflineTurnIndicator();
                 }
@@ -828,10 +373,8 @@
                 
                 if (id === local_player1Poison || id === local_player2Poison) {
                     element.classList.add('poison');
-                    element.innerHTML = '⚫'; // Coal emoji
                     handleOfflinePoisonHit(activePlayerName);
                 } else {
-                    element.innerHTML = '🎁'; // Present emoji
                     messageBox.textContent = 'Nice! Just a lovely gift...';
                     setTimeout(switchOfflineTurn, 1000); // Short delay
                 }
@@ -1283,7 +826,6 @@
                         local_gameState = 'P2_POISON_WAIT';
                         messageBox.innerHTML = `Coal set! <br/> Pass the device to ${local_player2Name}. <br/> (Click this box when ready)`;
                         messageBox.classList.add('transition');
-Two-Column (Text & Image)
                         grid.classList.add('opponent-picking'); // Start shiver
                     }
                     else if (local_gameState === 'P2_POISON') {
