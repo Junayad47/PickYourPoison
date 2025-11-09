@@ -642,7 +642,7 @@
              */
             function showScreen(screenName) {
                 // Stop any existing game listeners if we're leaving the game screen
-                if (isOnlineMode && screenName !== 'game') {
+                if (isOnlineMode && screenName !== 'game' && screenName !== 'loading') { // Keep listener on loading screen!
                     localGameUnsubscribe();
                 }
                 
@@ -909,38 +909,43 @@
              */
             async function initFirebase() {
                 try {
-                    // Use the Firebase config provided above
-                    app = globalApp; // Use the already initialized app
+                    app = globalApp;
                     db = getFirestore(app);
                     auth = getAuth(app);
-                    
-                    // Listen for auth state changes
+
                     return new Promise((resolve, reject) => {
-                        onAuthStateChanged(auth, async (user) => {
+                        const unsubscribe = onAuthStateChanged(auth, (user) => {
                             if (user) {
                                 userId = user.uid;
                                 console.log('Authenticated user:', userId);
+                                unsubscribe(); // Stop listening
                                 resolve(user);
                             } else {
-                                // No user, try to sign in
-                                try {
-                                    // Sign in anonymously as this is a public config
-                                    await signInAnonymously(auth);
-                                    // The onAuthStateChanged listener will fire again with the new user
-                                } catch (authError) {
-                                    console.error('Error signing in:', authError);
-                                    reject(authError);
-                                }
+                                // No user, try to sign in anonymously
+                                signInAnonymously(auth)
+                                    .then(() => {
+                                        // The onAuthStateChanged listener will fire again with the new user
+                                        // so we just wait.
+                                    })
+                                    .catch((authError) => {
+                                        console.error('Error signing in anonymously:', authError);
+                                        unsubscribe(); // Stop listening
+                                        reject(authError);
+                                    });
                             }
+                        }, (error) => {
+                            // Handle initial listener error
+                            console.error('Auth state listener error:', error);
+                            reject(error);
                         });
                     });
-
                 } catch (e) {
                     console.error('Error initializing Firebase:', e);
                     loadingMessage.textContent = 'Error connecting to North Pole Network. Please refresh.';
                     return Promise.reject(e);
                 }
             }
+
 
             /**
              * Host a new ONLINE game
@@ -1067,7 +1072,8 @@
             function updateUiFromGameData(gameData) {
                 if (gameData.gameState === 'LOBBY') {
                     // Still on loading screen, waiting for P2
-                    showScreen('loading');
+                    // We are already on the loading screen, just update text.
+                    // DO NOT call showScreen('loading') again, as it detaches the listener.
                     loadingTitle.textContent = 'Waiting for Player 2';
                     loadingMessage.textContent = 'Share the Game ID with a friend.';
                     gameIdDisplay.textContent = gameData.gameId;
