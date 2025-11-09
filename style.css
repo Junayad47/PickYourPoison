@@ -1,0 +1,582 @@
+/* ===================================
+   CHRISTMAS HAZARD GAME - ENHANCED CSS
+   =================================== */
+
+/* --- CSS Variables & Theme --- */
+:root {
+    --bg-night: #0a0e27;
+    --bg-night-light: #1a1d3a;
+    --bg-snow: #f8fafc;
+    --text-dark: #1e293b;
+    --text-light: #e2e8f0;
+    --festive-red: #dc2626;
+    --festive-red-dark: #991b1b;
+    --festive-green: #16a34a;
+    --festive-green-dark: #166534;
+    --gold: #fbbf24;
+    --gold-dark: #f59e0b;
+    --ice-blue: #7dd3fc;
+    --ice-blue-dark: #0369a1;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+}
+
+/* --- Global Reset --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* --- Body & Background --- */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: linear-gradient(135deg, var(--bg-night) 0%, var(--bg-night-light) 50%, #2d1b3d 100%);
+    color: var(--text-light);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* --- Animated Snow Background --- */
+#snow-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+
+.flake {
+    position: absolute;
+    top: -10px;
+    background: #fff;
+    border-radius: 50%;
+    opacity: 0.7;
+    animation: fall linear infinite;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+@keyframes fall {
+    to {
+        transform: translateY(105vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* --- Typography --- */
+h1, h2, h3 {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    text-align: center;
+    text-shadow: 2px 2px 4px var(--shadow-color);
+    margin-bottom: 16px;
+}
+
+h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    color: var(--festive-red);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    animation: titleGlow 2s ease-in-out infinite;
+    font-weight: 900;
+}
+
+@keyframes titleGlow {
+    0%, 100% {
+        text-shadow: 2px 2px 4px var(--shadow-color), 0 0 20px var(--festive-red);
+    }
+    50% {
+        text-shadow: 2px 2px 4px var(--shadow-color), 0 0 30px var(--gold), 0 0 40px var(--festive-red);
+    }
+}
+
+h2 {
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    color: var(--festive-green-dark);
+    font-weight: 700;
+}
+
+h3 {
+    font-size: clamp(1.2rem, 3vw, 1.5rem);
+    color: var(--text-dark);
+    font-weight: 600;
+}
+
+p {
+    font-size: clamp(0.95rem, 2vw, 1.1rem);
+    line-height: 1.7;
+    margin-bottom: 16px;
+    text-align: center;
+    color: var(--text-dark);
+}
+
+/* --- Game Container --- */
+#game-container {
+    width: 100%;
+    max-width: 950px;
+    background: linear-gradient(to bottom, #ffffff, var(--bg-snow));
+    color: var(--text-dark);
+    border: 6px solid var(--festive-red);
+    border-radius: 24px;
+    padding: clamp(20px, 4vw, 40px);
+    box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.4),
+        0 0 40px rgba(251, 191, 36, 0.3),
+        inset 0 2px 10px rgba(255, 255, 255, 0.8);
+    z-index: 1;
+    position: relative;
+    overflow: hidden; /* Hide snowman overflow */
+    transition: transform 0.3s ease;
+}
+
+/* --- Screens --- */
+.screen {
+    display: none;
+    animation: fadeIn 0.5s ease-in;
+}
+
+.screen.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* --- Snowman Decoration --- */
+#snowman {
+    position: absolute;
+    bottom: -15px;
+    left: 15px;
+    font-size: clamp(3rem, 8vw, 5rem);
+    z-index: 10;
+    transition: transform 0.3s ease;
+    user-select: none;
+    opacity: 0.95;
+    filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.3));
+    cursor: pointer;
+}
+
+#snowman:hover {
+    transform: scale(1.15) rotate(8deg);
+    filter: drop-shadow(4px 4px 8px rgba(0, 0, 0, 0.4));
+}
+
+/* --- Loading Spinner --- */
+.loader {
+    width: 70px;
+    height: 70px;
+    border: 6px solid #f3f3f3;
+    border-top: 6px solid var(--festive-red);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 30px auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+    text-align: center;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--festive-green-dark);
+}
+
+/* --- Input Groups --- */
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    font-size: clamp(1rem, 2.5vw, 1.2rem);
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--festive-green-dark);
+}
+
+.input-group input {
+    width: 100%;
+    padding: 14px 16px;
+    font-size: clamp(0.95rem, 2vw, 1.1rem);
+    border: 3px solid var(--festive-green);
+    border-radius: 12px;
+    background: #fff;
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: var(--festive-red);
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+    transform: translateY(-2px);
+}
+
+/* --- Game ID Display --- */
+#game-id-display {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border: 4px dashed var(--festive-red-dark);
+    padding: 20px;
+    font-size: clamp(1.8rem, 5vw, 2.5rem);
+    font-weight: 900;
+    text-align: center;
+    margin: 24px 0;
+    color: var(--festive-red-dark);
+    user-select: all;
+    letter-spacing: 5px;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease;
+    cursor: pointer;
+}
+
+#game-id-display:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* --- Buttons --- */
+.game-button {
+    display: block;
+    width: 100%;
+    padding: 16px 24px;
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-size: clamp(1.2rem, 3vw, 1.5rem);
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(135deg, var(--festive-red), var(--festive-red-dark));
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 16px;
+    box-shadow: 
+        0 6px 20px rgba(220, 38, 38, 0.4),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.2);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.game-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 
+        0 10px 30px rgba(220, 38, 38, 0.5),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.2);
+    background: linear-gradient(135deg, #ef4444, var(--festive-red));
+}
+
+.game-button:active {
+    transform: translateY(-1px);
+    box-shadow: 
+        0 4px 15px rgba(220, 38, 38, 0.4),
+        inset 0 2px 0 rgba(0, 0, 0, 0.2);
+}
+
+.game-button.secondary {
+    background: linear-gradient(135deg, var(--festive-green), var(--festive-green-dark));
+    box-shadow: 
+        0 6px 20px rgba(22, 163, 74, 0.4),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.2);
+}
+
+.game-button.secondary:hover {
+    background: linear-gradient(135deg, #22c55e, var(--festive-green));
+    box-shadow: 
+        0 10px 30px rgba(22, 163, 74, 0.5),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.2);
+}
+
+.game-button.gold {
+    background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+    box-shadow: 
+        0 6px 20px rgba(251, 191, 36, 0.4),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.2);
+}
+
+.game-button.gold:hover {
+    background: linear-gradient(135deg, #fcd34d, var(--gold));
+    box-shadow: 
+        0 10px 30px rgba(251, 191, 36, 0.5),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.2);
+}
+
+/* --- Status Bar --- */
+#status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background: #e0e6ec;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    border: 2px solid #cbd5e1;
+}
+
+.player-status {
+    font-size: 1.2rem;
+    font-weight: bold;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    flex: 1;
+    text-align: center;
+}
+
+.player-status:first-child { text-align: left; }
+.player-status:last-child { text-align: right; }
+
+.player-status.active {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border-color: var(--gold-dark);
+    color: var(--text-dark);
+    box-shadow: 
+        0 4px 15px rgba(0, 0, 0, 0.15),
+        0 0 20px rgba(251, 191, 36, 0.3);
+    animation: glow 1.5s ease-in-out infinite;
+}
+
+@keyframes glow {
+    0%, 100% {
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15), 0 0 20px rgba(251, 191, 36, 0.3);
+    }
+    50% {
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15), 0 0 30px rgba(251, 191, 36, 0.5);
+    }
+}
+
+#turn-indicator {
+    font-size: 1.5rem;
+    font-weight: bold;
+    flex: 1;
+    text-align: center;
+}
+
+/* --- Message Box --- */
+#message-box {
+    background: linear-gradient(135deg, #fef9c3, #fef3c7);
+    border: 3px solid var(--gold-dark);
+    border-radius: 16px;
+    padding: 20px;
+    font-size: clamp(1rem, 2.5vw, 1.3rem);
+    font-weight: 600;
+    text-align: center;
+    margin: 24px 0;
+    color: var(--text-dark);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    line-height: 1.5;
+}
+
+#message-box.transition {
+    cursor: pointer;
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+    border-color: var(--ice-blue-dark);
+    animation: pulse 1.5s ease-in-out infinite;
+    min-height: 300px;
+    font-size: 2rem;
+}
+
+#message-box.online-wait {
+    background: linear-gradient(135deg, var(--text-dark), #334155);
+    border-color: var(--ice-blue-dark);
+    color: var(--text-light);
+    min-height: 300px;
+    font-size: 2rem;
+}
+
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    }
+    50% {
+        transform: scale(1.02);
+        box-shadow: 0 6px 20px rgba(3, 105, 161, 0.3);
+    }
+}
+
+#message-box.transition:hover {
+    transform: scale(1.03);
+}
+
+/* --- Ornaments Grid --- */
+#ornament-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 16px;
+    margin: 24px 0;
+    padding: 20px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.5), rgba(248, 250, 252, 0.7));
+    border-radius: 16px;
+    border: 2px solid var(--festive-green);
+    box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.ornament {
+    aspect-ratio: 1;
+    background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+    border: 3px solid var(--ice-blue-dark);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(2rem, 5vw, 3rem);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    box-shadow: 
+        0 4px 10px rgba(0, 0, 0, 0.2),
+        inset 0 2px 5px rgba(255, 255, 255, 0.5);
+    user-select: none;
+    color: var(--ice-blue-dark);
+}
+
+.ornament::before {
+    content: '❄️'; /* Snowflake */
+    position: absolute;
+    font-size: inherit;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    text-shadow: 0 0 10px #fff;
+}
+
+.ornament:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 
+        0 8px 20px rgba(0, 0, 0, 0.3),
+        0 0 20px var(--gold),
+        inset 0 2px 5px rgba(255, 255, 255, 0.5);
+    border-color: var(--gold);
+}
+
+.ornament:hover::before {
+    transform: rotate(15deg) scale(1.1);
+}
+
+.ornament.revealed {
+    background: linear-gradient(135deg, #ffffff, #f1f5f9);
+    border-color: #94a3b8;
+    cursor: default;
+    pointer-events: none;
+    color: var(--text-dark);
+}
+
+.ornament.revealed::before {
+    content: '🎁'; /* Present */
+    text-shadow: none;
+}
+
+.ornament.poison {
+    background: linear-gradient(135deg, #475569, #1e293b);
+    border-color: #000;
+    animation: shake 0.5s ease;
+    color: #fff;
+}
+
+.ornament.poison::before {
+    content: '⚫'; /* Coal */
+    text-shadow: 0 0 10px #f00;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px) rotate(-5deg); }
+    75% { transform: translateX(10px) rotate(5deg); }
+}
+
+.ornament.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* --- Opponent Picking Animation --- */
+#ornament-grid.opponent-picking .ornament:not(.revealed) {
+    animation: shiver 0.3s ease-in-out infinite;
+}
+
+@keyframes shiver {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-2px); }
+    75% { transform: translateX(2px); }
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 768px) {
+    body {
+        padding: 12px;
+    }
+    
+    #game-container {
+        border-width: 4px;
+        border-radius: 20px;
+        padding: clamp(16px, 3vw, 24px);
+    }
+    
+    #snowman {
+        font-size: clamp(2.5rem, 10vw, 4rem);
+        bottom: -10px;
+        left: 10px;
+    }
+    
+    .game-button {
+        padding: 14px 20px;
+        margin-bottom: 12px;
+    }
+
+    #ornament-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        padding: 15px;
+    }
+    
+    #status-bar {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .player-status {
+        width: 100%;
+        text-align: center !important;
+    }
+
+}
+
+@media (max-width: 480px) {
+    .ornament {
+        border-width: 2px;
+        border-radius: 12px;
+        font-size: 2rem;
+    }
+    
+    #message-box {
+        padding: 16px;
+        margin: 16px 0;
+    }
+
+    #message-box.transition, #message-box.online-wait {
+        font-size: 1.5rem;
+        min-height: 250px;
+    }
+}
